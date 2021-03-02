@@ -398,13 +398,17 @@ export default class PaymentRequest {
     return this._acceptPromiseRejecter(new GatewayError(details.error));
   }
 
-  _closePaymentRequest() {
+  _closePaymentRequest(reject = true) {
     this._state = 'closed';
 
-    this._acceptPromiseRejecter(new Error('AbortError'));
+    if (reject) this._acceptPromiseRejecter(new Error('AbortError'));
 
     // Remove event listeners before aborting.
     this._removeEventListeners();
+  }
+  
+  stopRequest() {
+    if (this._state !== 'closed') this._closePaymentRequest(false)
   }
 
   _removeEventListeners() {
